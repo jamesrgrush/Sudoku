@@ -8,43 +8,49 @@ public class Grid {
     Grid() {
        for(int row = 0; row < 9; row++) {
            for (int column = 0; column < 9; column++) {
-               gridCells[row][column] = new Cell((row), (column));
+               gridCells[row][column] = new Cell(row, column);
             }
         }
     }
    
     public void populateGrid() {
     	
-    	Cell bestCandidate = gridCells[0][0];
+    	Cell bestCell = gridCells[0][0];
     	
     	while(true) {
-    		if (bestCandidate.getRow() == 9 ) {
+    		if (bestCell.getRow() == 10) {
     			break;
     		}
     		
-    		bestCandidate.setNumber(bestCandidate.getRandomCandidate());
-    		backtrackLog.push(bestCandidate);
     		
-    		if (updateCheckRows(bestCandidate.getRow(), bestCandidate.getNumber()) == false || updateCheckColumns(bestCandidate.getColumn(), bestCandidate.getNumber()) == false || updateCheckMeta(bestCandidate) == false) {
-    			bestCandidate.updateRenew();
-    			backtrackLog.pop();
-    			bestCandidate = backtrackLog.pop();
+    		bestCell.setNumber(bestCell.getRandomCandidate());
+    		
+    		if (checkGrid(bestCell) == true) {
+    			updateGrid(bestCell);
+    			backtrackLog.push(bestCell);
+    			bestCell = findBestCell();
     		}
     		
     		else {
-    			bestCandidate = findBestCandidate();
+    			if (bestCell.getNumOfCandidates() > 1) {
+    				bestCell.updateRemove(bestCell.getNumber());
+    			}
+    			else {
+    				bestCell.updateRenew();
+    				bestCell = backtrackLog.pop();
+    			}
     		}
     	}
     }
    
-    public Cell findBestCandidate() {
+    public Cell findBestCell() {
         int bestRow = 9;
         int bestColumn = 9;
         int fewestCandidates = 10;
  
         for(int row = 0; row < 9; row++) {
         	for(int column = 0; column < 9; column++) {
-        		if(gridCells[row][column].isEmpty() && gridCells[row][column].getNumOfCandidates() < fewestCandidates && gridCells[row][column].getNumOfCandidates() >= 1) {
+        		if(gridCells[row][column].isEmpty() == true && gridCells[row][column].getNumOfCandidates() < fewestCandidates) {
             		bestRow = row;
             		bestColumn = column;
             		fewestCandidates = gridCells[row][column].getNumOfCandidates();
@@ -62,47 +68,39 @@ public class Grid {
         }
     }
     
-    public boolean updateCheckRows(int bestRow, int randomCandidate) {
-    	boolean returnValue = true;
-    	
-        for (int parseColumns = 0; parseColumns < 9; parseColumns++) {
-            gridCells[bestRow][parseColumns].updateRemove(randomCandidate);
-            
-            if (gridCells[bestRow][parseColumns].getNumOfCandidates() == 0) {
-            	returnValue = false;
+    public void updateGrid(Cell cell) {
+    	for(int row = 0; row < 9; row++) {
+    		gridCells[row][cell.getColumn()].updateRemove(cell.getNumber());
+    		
+    		for(int column = 0; column < 9; column++) {
+    			gridCells[cell.getRow()][column].updateRemove(cell.getNumber());
+    			
+    			if (gridCells[row][column].getMetaRow() == cell.getMetaRow() && gridCells[row][column].getMetaColumn() == cell.getMetaColumn()) {
+    				gridCells[row][column].updateRemove(cell.getNumber());
+    			}
             }
         }
-        return returnValue;
     }
     
-    public boolean updateCheckColumns(int bestColumn, int randomCandidate) {
+    public boolean checkGrid(Cell newCell) {
     	boolean returnValue = true;
     	
-        for (int parseRows = 0; parseRows < 9; parseRows++) {
-            gridCells[parseRows][bestColumn].updateRemove(randomCandidate);
-            
-            if (gridCells[parseRows][bestColumn].getNumOfCandidates() == 0) {
-            	returnValue = false;
-            }
-        }
-        return returnValue;
-    }
-    
-    public boolean updateCheckMeta(Cell bestCandidate) {
-    	boolean returnValue = true;
-    	
-        for (int row = 0; row < 9; row++) {
-            for (int column = 0; column < 9; column++) {
-                if(gridCells[row][column].getMetaRow() == bestCandidate.getMetaRow() && gridCells[row][column].getMetaColumn() == bestCandidate.getMetaColumn()) {
-                    gridCells[row][column].updateRemove(bestCandidate.getNumber());
-                    
-                    if (gridCells[row][column].getNumOfCandidates() == 0) {
-                    	returnValue = false;
-                    }
-                }
-            }
-        }
-        return returnValue;
+    	for (int row = 0; row < 9; row++) {
+    		if (gridCells[row][newCell.getColumn()].getNumber() == newCell.getNumber()) {
+    			return false;
+    		}
+    		
+    		for (int column = 0; column < 9; column++) {
+    			if (gridCells[newCell.getRow()][column].getNumber() == newCell.getNumber()) {
+    				return false;
+    			}
+    			
+    			if (gridCells[row][column].getMetaRow() == newCell.getMetaRow() && gridCells[row][column].getMetaColumn() == newCell.getMetaColumn() && gridCells[row][column].getNumber() == newCell.getNumber()) {
+    				return false;
+    			}
+    		}
+    	}
+    	return returnValue;
     }
     
     public Cell[][] getGrid() {
