@@ -37,7 +37,8 @@ public class Cell {
     }
     
     public int getNumOfCandidates() {
-        return candidates.size();
+    		return candidates.size();
+    	
     }
     
     public int getRandomCandidate() {
@@ -58,11 +59,11 @@ public class Cell {
     }
     
     public void findMetaPos() {
-       if (row/2 <= 1) {
+       if (row <= 2) {
            metaRow = 0;
         }
        
-       else if (row/5 <=1) {
+       else if (row <= 5) {
            metaRow = 1;
         }
         
@@ -70,11 +71,11 @@ public class Cell {
             metaRow = 2;
         }
         
-        if (column/2 <= 1) {
+        if (column <= 2) {
            metaColumn = 0;
         }
        
-       else if (column/5 <=1) {
+       else if (column <= 5) {
            metaColumn = 1;
         }
         
@@ -92,6 +93,13 @@ public class Cell {
     		candidates.remove(candidates.indexOf(usedCandidate));
     	}
     }
+    
+    public void updateAdd(int prevCandidate) {
+    	if (candidates.contains(prevCandidate) == false) {
+    		candidates.add(prevCandidate);
+    	}
+    }
+    
     
     public void updateRenew() {
     	candidates.clear();

@@ -22,8 +22,15 @@ public class Grid {
     			break;
     		}
     		
+    		if (bestCell.getNumOfCandidates() > 0) {
+    			bestCell.setNumber(bestCell.getRandomCandidate());
+    		}
     		
-    		bestCell.setNumber(bestCell.getRandomCandidate());
+    		else {
+    			bestCell.updateRenew();
+    			bestCell = backtrackLog.pop();
+    			continue;
+    		}
     		
     		if (checkGrid(bestCell) == true) {
     			updateGrid(bestCell);
@@ -32,14 +39,11 @@ public class Grid {
     		}
     		
     		else {
-    			if (bestCell.getNumOfCandidates() > 1) {
-    				bestCell.updateRemove(bestCell.getNumber());
-    			}
-    			else {
-    				bestCell.updateRenew();
-    				bestCell = backtrackLog.pop();
-    			}
+    			bestCell.updateRemove(bestCell.getNumber());
+    			bestCell.setNumber(0);
     		}
+    			
+    			
     	}
     }
    
@@ -86,21 +90,35 @@ public class Grid {
     	boolean returnValue = true;
     	
     	for (int row = 0; row < 9; row++) {
-    		if (gridCells[row][newCell.getColumn()].getNumber() == newCell.getNumber()) {
+    		if (gridCells[row][newCell.getColumn()] != newCell && gridCells[row][newCell.getColumn()].getNumber() == newCell.getNumber()) {
     			return false;
     		}
     		
     		for (int column = 0; column < 9; column++) {
-    			if (gridCells[newCell.getRow()][column].getNumber() == newCell.getNumber()) {
+    			if (gridCells[newCell.getRow()][column] != newCell && gridCells[newCell.getRow()][column].getNumber() == newCell.getNumber()) {
     				return false;
     			}
     			
-    			if (gridCells[row][column].getMetaRow() == newCell.getMetaRow() && gridCells[row][column].getMetaColumn() == newCell.getMetaColumn() && gridCells[row][column].getNumber() == newCell.getNumber()) {
+    			if (gridCells[row][column] != newCell && gridCells[row][column].getMetaRow() == newCell.getMetaRow() && gridCells[row][column].getMetaColumn() == newCell.getMetaColumn() && gridCells[row][column].getNumber() == newCell.getNumber()) {
     				return false;
     			}
     		}
     	}
     	return returnValue;
+    }
+    
+    public void updateUndo(Cell badCell) {
+    	for(int row = 0; row < 9; row++) {
+    		gridCells[row][badCell.getColumn()].updateAdd(badCell.getNumber());
+    		
+    		for(int column = 0; column < 9; column++) {
+    			gridCells[badCell.getRow()][column].updateAdd(badCell.getNumber());
+    			
+    			if (gridCells[row][column].getMetaRow() == badCell.getMetaRow() && gridCells[row][column].getMetaColumn() == badCell.getMetaColumn()) {
+    				gridCells[row][column].updateRemove(badCell.getNumber());
+    			}
+            }
+        }
     }
     
     public Cell[][] getGrid() {
