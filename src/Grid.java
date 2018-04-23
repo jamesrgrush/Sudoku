@@ -124,8 +124,10 @@ public class Grid {
     public Cell[][] getGrid() {
     	return gridCells;
     }
-                    
-     public void logCell(Cell usedCell) {
-    	 backtrackLog.add(usedCell);
-     }
+    
+    public int getCell(int row, int column) {
+
+    	return gridCells[row][column].getNumber();
+    	
+    }
 }
