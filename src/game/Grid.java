@@ -4,6 +4,7 @@ import java.util.Stack;
 public class Grid {
     
     private Cell[][] gridCells = new Cell[9][9];
+    private int[][] puzzleGrid = new int[9][9];
     private Stack<Cell> backtrackLog = new Stack<Cell>();
    
     Grid() {
@@ -123,16 +124,29 @@ public class Grid {
     }
     
     public int[][] getGridNums() {
-    	int[][] copyGridNums = new int[9][9];
+    	/*int[][] copyPuzzleNums = new int[9][9];
     	for(int row = 0; row < 9; row++) {
     		for(int column = 0; column < 9; column++) {
-    			copyGridNums[row][column] = gridCells[row][column].getNumber();
+    			copyPuzzleNums[row][column] = puzzleGrid[row][column];
     		}
     	}
-    	return copyGridNums;
+    	return copyPuzzleNums;*/
+    	int[][] copyPuzzleNums = new int[9][9];
+    	for(int row = 0; row < 9; row++) {
+    		for(int column = 0; column < 9; column++) {
+    			copyPuzzleNums[row][column] = gridCells[row][column].getNumber();
+    		}
+    	}
+    	return copyPuzzleNums;
     }
     
     public Cell getCell(int row, int column) {
     	return gridCells[row][column];
     }
+    
+    public void trimGrid(int difficulty) {
+    //If you only remove a number that you know could be deduced from the numbers that remain, 
+    //then the Sudoku obviously still has a unique solution.	
+    }
+    
 }

@@ -48,35 +48,35 @@ public class Main extends Application{
 			numSelected = 1;
 		});
 		Button num2 = new Button("2");
-		num1.setOnAction(e -> {
+		num2.setOnAction(e -> {
 			numSelected = 2;
 		});
 		Button num3 = new Button("3");
-		num1.setOnAction(e -> {
+		num3.setOnAction(e -> {
 			numSelected = 3;
 		});
 		Button num4 = new Button("4");
-		num1.setOnAction(e -> {
+		num4.setOnAction(e -> {
 			numSelected = 4;
 		});
 		Button num5 = new Button("5");
-		num1.setOnAction(e -> {
+		num5.setOnAction(e -> {
 			numSelected = 5;
 		});
 		Button num6 = new Button("6");
-		num1.setOnAction(e -> {
+		num6.setOnAction(e -> {
 			numSelected = 6;
 		});
 		Button num7 = new Button("7");
-		num1.setOnAction(e -> {
+		num7.setOnAction(e -> {
 			numSelected = 7;
 		});
 		Button num8 = new Button("8");
-		num1.setOnAction(e -> {
+		num8.setOnAction(e -> {
 			numSelected = 8;
 		});
 		Button num9 = new Button("9");
-		num1.setOnAction(e -> {
+		num9.setOnAction(e -> {
 			numSelected = 9;
 		});
 		
@@ -104,6 +104,7 @@ public class Main extends Application{
 
 		        GridPane box = new GridPane();
 		        box.setStyle("-fx-background-color: black, -fx-control-inner-background; -fx-background-insets: 0, 2; -fx-padding: 2;");
+		        
 		        for (int column = 0; column < 3; column++) {
 		            for (int row = 0 ; row < 3; row++) {
 		                Button boardCell = new Button();
@@ -118,7 +119,7 @@ public class Main extends Application{
 		                GridPane.setConstraints(boardCell, column, row);
 		                boardCell.setOnAction(e -> {
 		                	boardCell.setText(Integer.toString(numSelected));
-		                	grid.getCell((box.getRowIndex(boardCell) + (board.getRowIndex(boardCell) * 3)), (box.getColumnIndex(boardCell) + (board.getColumnIndex(boardCell) * 3))).setPlayerNumber(numSelected);
+		                	grid.getCell((GridPane.getRowIndex(boardCell) + (GridPane.getRowIndex(box) * 3)), (GridPane.getColumnIndex(boardCell) + (GridPane.getColumnIndex(box) * 3))).setPlayerNumber(numSelected);
 		                });
 		                box.getChildren().add(boardCell);
 		            }
