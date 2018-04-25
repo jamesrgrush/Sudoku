@@ -1,3 +1,4 @@
+package game;
 import java.util.Stack;
 
 public class Grid {
@@ -121,13 +122,17 @@ public class Grid {
         }
     }
     
-    public Cell[][] getGrid() {
-    	return gridCells;
+    public int[][] getGridNums() {
+    	int[][] copyGridNums = new int[9][9];
+    	for(int row = 0; row < 9; row++) {
+    		for(int column = 0; column < 9; column++) {
+    			copyGridNums[row][column] = gridCells[row][column].getNumber();
+    		}
+    	}
+    	return copyGridNums;
     }
     
-    public int getCell(int row, int column) {
-
-    	return gridCells[row][column].getNumber();
-    	
+    public Cell getCell(int row, int column) {
+    	return gridCells[row][column];
     }
 }

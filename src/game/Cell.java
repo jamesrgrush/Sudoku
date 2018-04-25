@@ -1,10 +1,11 @@
+package game;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Cell {
 	Random ran = new Random();
 	
-    private int row, column, metaRow, metaColumn, number;
+    private int row, column, metaRow, metaColumn, number, playerNumber;
     private ArrayList<Integer> candidates = new ArrayList<Integer>();
     
     Cell(int row, int column) {
@@ -52,6 +53,14 @@ public class Cell {
     		}
     		return 0;
     	}
+    }
+    
+    public int getPlayerNumber() {
+    	return playerNumber;
+    }
+    
+    public void setPlayerNumber(int playerNumber) {
+    	this.playerNumber = playerNumber;
     }
     
     public void setNumber(int number) {
