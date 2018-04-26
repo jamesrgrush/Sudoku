@@ -1,11 +1,12 @@
 package game;
+import java.util.Random;
 import java.util.Stack;
 
 public class Grid {
     
-    private Cell[][] gridCells = new Cell[9][9];
     private int[][] puzzleGrid = new int[9][9];
     private Stack<Cell> backtrackLog = new Stack<Cell>();
+    Random ran = new Random();
    
     Grid() {
        for(int row = 0; row < 9; row++) {
@@ -145,8 +146,42 @@ public class Grid {
     }
     
     public void trimGrid(int difficulty) {
-    //If you only remove a number that you know could be deduced from the numbers that remain, 
-    //then the Sudoku obviously still has a unique solution.	
+    	int removeCount = 0;
+    	switch(difficulty) {
+    		case 0: removeCount = 10;
+    		case 1: removeCount = 15;
+    		case 2: removeCount = 20;
+    	}
+    	
+    	findRemove(removeCount);
     }
     
+    public int findRemove(int count) {
+    	if(count == 0) {
+    		return 0;
+    	}
+    	
+    	Cell removeCell = gridCells[ran.nextInt(9)][ran.nextInt(9)];
+    	if(removeCell.isEmpty() == true && numOfSol(0, 0, 0) == 1) {
+    		return findRemove(count);
+    	}
+    	
+    	removeCell.setNumber(0);
+    	return findRemove(count - 1);
+    }
+    
+    public static int numOfSol(int row, int column, int count) {
+    	if (column == 9) {
+    		column = 0;
+    		if(++row == 9) {
+    			return count + 1;
+    		}
+    	}
+    	
+    	if(gridCells[row][column].isEmpty() == true) {
+    		return numOfSol(column + 1, row, count);
+    	}
+    	
+    	
+    }
 }
