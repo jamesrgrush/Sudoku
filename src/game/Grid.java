@@ -4,6 +4,7 @@ import java.util.Stack;
 
 public class Grid {
     
+	private static Cell[][] gridCells = new Cell[9][9];
     private int[][] puzzleGrid = new int[9][9];
     private Stack<Cell> backtrackLog = new Stack<Cell>();
     Random ran = new Random();
@@ -19,14 +20,15 @@ public class Grid {
     public void populateGrid() {
     	
     	Cell bestCell = gridCells[0][0];
+    	int posVal;
     	
     	while(true) {
     		if (bestCell.getRow() == 10) {
     			break;
     		}
     		
-    		if (bestCell.getNumOfCandidates() > 0) {
-    			bestCell.setNumber(bestCell.getRandomCandidate());
+    		if (bestCell.getNumOfCandidates() >= 1) {
+    			posVal = bestCell.getRandomCandidate();
     		}
     		
     		else {
@@ -35,7 +37,8 @@ public class Grid {
     			continue;
     		}
     		
-    		if (checkGrid(bestCell) == true) {
+    		if (checkGrid(bestCell, posVal) == true) {
+    			bestCell.setNumber(posVal);
     			updateGrid(bestCell);
     			backtrackLog.push(bestCell);
     			bestCell = findBestCell();
@@ -43,7 +46,6 @@ public class Grid {
     		
     		else {
     			bestCell.updateRemove(bestCell.getNumber());
-    			bestCell.setNumber(0);
     		}
     			
     			
@@ -77,48 +79,54 @@ public class Grid {
     
     public void updateGrid(Cell cell) {
     	for(int row = 0; row < 9; row++) {
-    		gridCells[row][cell.getColumn()].updateRemove(cell.getNumber());
+    		if(gridCells[row][cell.getColumn()] != cell) {
+    			gridCells[row][cell.getColumn()].updateRemove(cell.getNumber());
+    		}
     		
     		for(int column = 0; column < 9; column++) {
-    			gridCells[cell.getRow()][column].updateRemove(cell.getNumber());
+    			if(gridCells[cell.getRow()][column] != cell) {
+    				gridCells[cell.getRow()][column].updateRemove(cell.getNumber());
+    			}
     			
-    			if (gridCells[row][column].getMetaRow() == cell.getMetaRow() && gridCells[row][column].getMetaColumn() == cell.getMetaColumn()) {
+    			if (gridCells[row][column].getMetaRow() == cell.getMetaRow() && gridCells[row][column].getMetaColumn() == cell.getMetaColumn() && gridCells[row][column] != cell) {
     				gridCells[row][column].updateRemove(cell.getNumber());
     			}
             }
         }
     }
     
-    public boolean checkGrid(Cell newCell) {
-    	boolean returnValue = true;
-    	
+    public static boolean checkGrid(Cell newCell, int posVal) {
     	for (int row = 0; row < 9; row++) {
-    		if (gridCells[row][newCell.getColumn()] != newCell && gridCells[row][newCell.getColumn()].getNumber() == newCell.getNumber()) {
+    		if (gridCells[row][newCell.getColumn()] != newCell && gridCells[row][newCell.getColumn()].getNumber() == posVal) {
     			return false;
     		}
     		
     		for (int column = 0; column < 9; column++) {
-    			if (gridCells[newCell.getRow()][column] != newCell && gridCells[newCell.getRow()][column].getNumber() == newCell.getNumber()) {
+    			if (gridCells[newCell.getRow()][column] != newCell && gridCells[newCell.getRow()][column].getNumber() == posVal) {
     				return false;
     			}
     			
-    			if (gridCells[row][column] != newCell && gridCells[row][column].getMetaRow() == newCell.getMetaRow() && gridCells[row][column].getMetaColumn() == newCell.getMetaColumn() && gridCells[row][column].getNumber() == newCell.getNumber()) {
+    			if (gridCells[row][column] != newCell && gridCells[row][column].getMetaRow() == newCell.getMetaRow() && gridCells[row][column].getMetaColumn() == newCell.getMetaColumn() && gridCells[row][column].getNumber() == posVal) {
     				return false;
     			}
     		}
     	}
-    	return returnValue;
+    	return true;
     }
     
-    public void updateUndo(Cell badCell) {
+    public void updateTrim(Cell trimmedCell, int oldNum) {
     	for(int row = 0; row < 9; row++) {
-    		gridCells[row][badCell.getColumn()].updateAdd(badCell.getNumber());
+    		if(gridCells[row][trimmedCell.getColumn()] != trimmedCell) {
+    			gridCells[row][trimmedCell.getColumn()].updateAdd(oldNum);
+    		}
     		
     		for(int column = 0; column < 9; column++) {
-    			gridCells[badCell.getRow()][column].updateAdd(badCell.getNumber());
+        		if(gridCells[trimmedCell.getRow()][column] != trimmedCell) {
+        			gridCells[trimmedCell.getRow()][column].updateAdd(oldNum);
+        		}
     			
-    			if (gridCells[row][column].getMetaRow() == badCell.getMetaRow() && gridCells[row][column].getMetaColumn() == badCell.getMetaColumn()) {
-    				gridCells[row][column].updateRemove(badCell.getNumber());
+    			if (gridCells[row][column].getMetaRow() == trimmedCell.getMetaRow() && gridCells[row][column].getMetaColumn() == trimmedCell.getMetaColumn() && gridCells[row][column] != trimmedCell) {
+    				gridCells[row][column].updateAdd(oldNum);
     			}
             }
         }
@@ -149,8 +157,11 @@ public class Grid {
     	int removeCount = 0;
     	switch(difficulty) {
     		case 0: removeCount = 10;
+    		break;
     		case 1: removeCount = 15;
+    		break;
     		case 2: removeCount = 20;
+    		break;
     	}
     	
     	findRemove(removeCount);
@@ -162,26 +173,47 @@ public class Grid {
     	}
     	
     	Cell removeCell = gridCells[ran.nextInt(9)][ran.nextInt(9)];
-    	if(removeCell.isEmpty() == true && numOfSol(0, 0, 0) == 1) {
+    	if(removeCell.isEmpty() == true) {
     		return findRemove(count);
     	}
     	
+    	int holdNum = removeCell.getNumber();
     	removeCell.setNumber(0);
-    	return findRemove(count - 1);
+    	if (numOfSol(0,0,0) == 1) {
+        	updateTrim(removeCell, holdNum);
+        	return findRemove(count - 1);
+    	}
+    	
+    	else {
+    		removeCell.setNumber(holdNum);
+    		
+    		return findRemove(count);
+    	}
     }
     
-    public static int numOfSol(int row, int column, int count) {
+    public static int numOfSol(int row, int column, int countSol) {
     	if (column == 9) {
     		column = 0;
+    		
     		if(++row == 9) {
-    			return count + 1;
+    			return countSol + 1;
     		}
     	}
     	
-    	if(gridCells[row][column].isEmpty() == true) {
-    		return numOfSol(column + 1, row, count);
+    	if(gridCells[row][column].isEmpty() == false) {
+    		return numOfSol(row, column + 1, countSol);
     	}
     	
+    	for(int i = 0; i < gridCells[row][column].getNumOfCandidates() && countSol < 2; i++) {
+    		int posVal = gridCells[row][column].getRandomCandidate();
+    		
+    		if(checkGrid(gridCells[row][column], posVal) == true) {
+    			gridCells[row][column].setNumber(posVal);
+    			countSol = numOfSol(row, column + 1, countSol);
+    		}
+    	}
     	
+    	gridCells[row][column].setNumber(0);
+    	return countSol;    	
     }
 }

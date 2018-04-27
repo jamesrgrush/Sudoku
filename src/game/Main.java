@@ -135,7 +135,7 @@ public class Main extends Application{
 	public void showPuzzle(int difficulty) {
 		Grid grid = new Grid();
 		grid.populateGrid();
-		//grid.TrimGrid(difficulty);
+		grid.trimGrid(difficulty);
 		setGridNums(grid.getGridNums());
 	}
 
