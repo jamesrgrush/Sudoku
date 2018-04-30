@@ -5,13 +5,15 @@ import java.util.Random;
 public class Cell {
 	Random ran = new Random();
 	
-    private int row, column, metaRow, metaColumn, number, playerNumber;
+    private int row, column, metaRow, metaColumn, number;
+    //Stores list of valid numbers for the cell
     private ArrayList<Integer> candidates = new ArrayList<Integer>();
     
     Cell(int row, int column) {
         this.row = row;
         this.column = column;
         findMetaPos();
+        //Adds all candidates (1-9) to the ArrayList
         for (int i = 1; i < 10; i++) {
             candidates.add(i);
         }
@@ -42,31 +44,17 @@ public class Cell {
     	
     }
     
+    //Gets a random candidate from the ArrayList and returns it
     public int getRandomCandidate() {
-    	try {
         return candidates.get(ran.nextInt(candidates.size()));
-    	}
-    	catch (IllegalArgumentException ex) {
-    		System.out.println(this.getNumOfCandidates());
-    		for (int i = 0; i <= candidates.size(); i++) {
-    			System.out.println(candidates.get(i));
-    		}
-    		return 0;
-    	}
-    }
-    
-    public int getPlayerNumber() {
-    	return playerNumber;
-    }
-    
-    public void setPlayerNumber(int playerNumber) {
-    	this.playerNumber = playerNumber;
+    	
     }
     
     public void setNumber(int number) {
         this.number = number;
     }
     
+    //Calculates the location of the cell in the meta 3x3 grid
     public void findMetaPos() {
        if (row <= 2) {
            metaRow = 0;
@@ -97,19 +85,21 @@ public class Cell {
         return number == 0;
     }
     
+    //Removes the number from the cell's list of candidates if its not already absent
     public void updateRemove(int usedCandidate) {
     	if (candidates.contains(usedCandidate)) {
     		candidates.remove(candidates.indexOf(usedCandidate));
     	}
     }
     
+    //Adds the number to the cell's list of candidates if its not already present
     public void updateAdd(int prevCandidate) {
     	if (candidates.contains(prevCandidate) == false) {
     		candidates.add(prevCandidate);
     	}
     }
     
-    
+    //Removes all the cell's candidates and then adds all candidates (1-9) to avoide suplicate entries
     public void updateRenew() {
     	candidates.clear();
     	 for (int i = 1; i < 10; i++) {
