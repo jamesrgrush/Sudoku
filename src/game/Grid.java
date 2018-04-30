@@ -5,7 +5,7 @@ import java.util.Stack;
 public class Grid {
     
 	private static Cell[][] gridCells = new Cell[9][9];
-    private int[][] puzzleGrid = new int[9][9];
+    private static Cell[][] copyGrid = new Cell[9][9];
     private Stack<Cell> backtrackLog = new Stack<Cell>();
     Random ran = new Random();
    
@@ -77,7 +77,7 @@ public class Grid {
         }
     }
     
-    public void updateGrid(Cell cell) {
+    public static void updateGrid(Cell cell) {
     	for(int row = 0; row < 9; row++) {
     		if(gridCells[row][cell.getColumn()] != cell) {
     			gridCells[row][cell.getColumn()].updateRemove(cell.getNumber());
@@ -114,7 +114,7 @@ public class Grid {
     	return true;
     }
     
-    public void updateTrim(Cell trimmedCell, int oldNum) {
+    public static void updateTrim(Cell trimmedCell, int oldNum) {
     	for(int row = 0; row < 9; row++) {
     		if(gridCells[row][trimmedCell.getColumn()] != trimmedCell) {
     			gridCells[row][trimmedCell.getColumn()].updateAdd(oldNum);
@@ -156,14 +156,15 @@ public class Grid {
     public void trimGrid(int difficulty) {
     	int removeCount = 0;
     	switch(difficulty) {
-    		case 0: removeCount = 10;
+    		case 0: removeCount = 15;
     		break;
-    		case 1: removeCount = 15;
+    		case 1: removeCount = 25;
     		break;
-    		case 2: removeCount = 20;
+    		case 2: removeCount = 30;
     		break;
     	}
     	
+    	copyGrid = gridCells.clone();
     	findRemove(removeCount);
     }
     
@@ -179,14 +180,15 @@ public class Grid {
     	
     	int holdNum = removeCell.getNumber();
     	removeCell.setNumber(0);
+    	copyGrid = gridCells.clone();
     	if (numOfSol(0,0,0) == 1) {
         	updateTrim(removeCell, holdNum);
+        	copyGrid = gridCells.clone();
         	return findRemove(count - 1);
     	}
     	
     	else {
     		removeCell.setNumber(holdNum);
-    		
     		return findRemove(count);
     	}
     }
@@ -194,26 +196,24 @@ public class Grid {
     public static int numOfSol(int row, int column, int countSol) {
     	if (column == 9) {
     		column = 0;
-    		
-    		if(++row == 9) {
+    		++row;
+    		if(row == 9) {
     			return countSol + 1;
     		}
     	}
     	
-    	if(gridCells[row][column].isEmpty() == false) {
+    	if(copyGrid[row][column].isEmpty() == false) {
     		return numOfSol(row, column + 1, countSol);
     	}
     	
-    	for(int i = 0; i < gridCells[row][column].getNumOfCandidates() && countSol < 2; i++) {
-    		int posVal = gridCells[row][column].getRandomCandidate();
-    		
-    		if(checkGrid(gridCells[row][column], posVal) == true) {
-    			gridCells[row][column].setNumber(posVal);
+    	for(int i = 1; i <= 9 && countSol < 2; i++) {
+    		if(checkGrid(copyGrid[row][column], i) == true) {
+    			copyGrid[row][column].setNumber(i);
     			countSol = numOfSol(row, column + 1, countSol);
     		}
     	}
     	
-    	gridCells[row][column].setNumber(0);
-    	return countSol;    	
+    	copyGrid[row][column].setNumber(0);
+    	return countSol;
     }
 }
